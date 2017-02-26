@@ -48,7 +48,7 @@ def main():
     group = parser.add_option_group('Label options')
     group.add_option('--labels', dest='labels',
                      help='Specify the labels', metavar='LABEL,LABEL')
-    group.add_option('--labell-ranges', dest='labels_ranges',
+    group.add_option('--labels-ranges', dest='labels_ranges',
                      help='Specify the labels ranges', metavar='RANGE,RANGE')
 
     (options, args) = parser.parse_args()
