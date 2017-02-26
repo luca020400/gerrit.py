@@ -1,8 +1,8 @@
 [Defaults]
-review_url=review.lineageos.org
+review_url=https://review.lineageos.org
 
-[review.lineageos.org]
+[https://review.lineageos.org]
 username=cat
 password=dog
 labels=Code-Review,Verified
-labels_range=2,1
+labels_ranges=2,1
