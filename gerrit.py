@@ -26,8 +26,7 @@ def main():
     # Gerrit - URL
     group = parser.add_option_group('Gerrit options')
     group.add_option('-r', '--review-url', dest='review_url',
-                     help='Gerrit URL', metavar='URL',
-                     default=config.get("Defaults", "review_url"))
+                     help='Gerrit URL', metavar='URL')
 
     # Gerrit - Login Data
     group.add_option('-u', '--username', dest='username',
@@ -51,15 +50,20 @@ def main():
         parser.error('You must specify either a range of commits or a topic')
         sys.exit()
 
-    if not options.review_url:
-        parser.error('Review URL must be set')
-        sys.exit()
+    if options.review_url:
+        review_url = options.review_url
+    else:
+        try:
+            review_url = config.get("Defaults", "review_url")
+        except:
+            parser.error('Review URL must be set')
+            sys.exit()
 
     if options.username:
         username = options.username
     else:
         try:
-            username = config.get(options.review_url, "username")
+            username = config.get(review_url, "username")
         except:
             parser.error('Username must be set')
             sys.exit()
@@ -68,7 +72,7 @@ def main():
         password = options.password
     else:
         try:
-            password = config.get(options.review_url, "password")
+            password = config.get(review_url, "password")
         except:
             parser.error('Password must be set')
             sys.exit()
@@ -76,7 +80,7 @@ def main():
     auth = HTTPDigestAuth(username=username, password=password)
 
     changes = []
-    url = "https://" + options.review_url + "/a/changes/"
+    url = "https://" + review_url + "/a/changes/"
 
     if options.topic:
         print('Fetching topic changes')
@@ -140,16 +144,17 @@ def main():
                 print("Already at top of HEAD")
                 pass
 
-            # +2 it
+            # Apply labels needed for a merge
             j = {}
             j['labels'] = {}
             try:
-                labels = config.get(options.review_url, "labels").split(',')
-                labels_range = config.get(options.review_url, "labels_range").split(',')
+                labels = config.get(review_url, "labels").split(',')
+                labels_range = config.get(review_url, "labels_range").split(',')
                 for i in labels.size:
                     j['labels'][labels[i]] = '+' + labels_range[i]
             except:
                 print('Failed to parse labels')
+                sys.exit(1)
             response = requests.post(url + c + "/revisions/current/review", auth=auth, json=j)
             if response.status_code != 200:
                 print("Failed to +2 change " + c + " with error " + str(
