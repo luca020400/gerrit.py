@@ -86,8 +86,7 @@ def main():
         print('Fetching topic changes')
         response = requests.get(url + "?q=topic:" + options.topic, auth=auth)
         if response.status_code != 200:
-            print("Could not fetch topic changes")
-            sys.exit()
+            sys.exit("Could not fetch topic changes")
         else:
             j = json.loads(response.text[5:])
             for k in j:
@@ -97,8 +96,8 @@ def main():
         for i, param in enumerate(args):
             if '-' in param:
                 templist = param.split('-')
-                for i in range(int(templist[0]), int(templist[1]) + 1):
-                    changes.append(str(i))
+                for j in range(int(templist[0]), int(templist[1]) + 1):
+                    changes.append(str(j))
             else:
                 changes.append(param)
 
@@ -113,8 +112,7 @@ def main():
         try:
             response = requests.get(url + c + "/detail/", auth=auth)
             if response.status_code != 200:
-                print("Could not fetch commit information")
-                sys.exit()
+                sys.exit("Could not fetch commit information")
             else:
                 j = json.loads(response.text[5:])
                 messages.append("[%s] %s" % (j['status'], j['subject']))
@@ -128,20 +126,17 @@ def main():
         i = input("\nAbout to submit the preceeding commits. You good with this? [y/N] ")
 
         if i != 'y':
-            print("Cancelled...")
-            sys.exit()
+            sys.exit("Cancelled...")
 
         # Load labels needed for the submit
-        j = {}
-        j['labels'] = {}
+        j = {'labels': {}}
         try:
             labels = config.get(review_url, "labels").split(',')
             labels_range = config.get(review_url, "labels_range").split(',')
             for i in labels.size:
                 j['labels'][labels[i]] = '+' + labels_range[i]
         except:
-            print('Failed to parse labels')
-            sys.exit(1)
+            sys.exit('Failed to parse labels')
 
         for c in changes:
             try:
@@ -149,18 +144,16 @@ def main():
                 response = requests.post(url + c + "/rebase", auth=auth)
                 if response.status_code != 200:
                     if response.status_code != 409 or "Change is already" not in response.text:
-                        print("Failed to rebase " + c + " with error " + str(
+                        sys.exit("Failed to rebase " + c + " with error " + str(
                             response.status_code) + ": " + response.text.rstrip())
-                        sys.exit(0)
             except Exception:
                 print("Already at top of HEAD")
                 pass
 
             response = requests.post(url + c + "/revisions/current/review", auth=auth, json=j)
             if response.status_code != 200:
-                print("Failed to apply labels to change " + c + " with error " + str(
+                sys.exit("Failed to apply labels to change " + c + " with error " + str(
                     response.status_code) + ": " + response.text.rstrip())
-                sys.exit(0)
 
             # Submit it
             response = requests.post(url + c + "/revisions/current/submit", auth=auth)
@@ -174,21 +167,17 @@ def main():
         i = input("\nAbout to add reviewers to the preceeding commits. You good with this? [y/N] ")
 
         if i != 'y':
-            print("Cancelled...")
-            sys.exit()
+            sys.exit("Cancelled...")
 
         for c in changes:
             reviewers = options.reviewers.split(',')
             for reviewer in reviewers:
-                j = {}
-                j['reviewer'] = reviewer
+                j = {'reviewer': reviewer}
                 response = requests.post(url + c + "/reviewers", auth=auth, json=j)
                 if response.status_code == 200:
                     # Handle groups
                     if "Do you want to add them all as reviewers?" in response.text:
-                        j = {}
-                        j['input'] = reviewer
-                        j['confirmed'] = 'true'
+                        j = {'input': reviewer, 'confirmed': 'true'}
                         requests.post(url + c + "/reviewers", auth=auth, json=j)
                     print('Succesfully added ' + reviewer + ' to ' + c)
                 else:
