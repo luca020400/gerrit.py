@@ -92,7 +92,7 @@ def main():
             for k in j:
                 changes.append(str(k['_number']))
 
-    if len(args) >= 1:
+    if args:
         for i, param in enumerate(args):
             if '-' in param:
                 templist = param.split('-')
