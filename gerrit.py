@@ -125,7 +125,7 @@ def main():
         print(m)
 
     if options.submit:
-        i = input("\nAbout to ship the preceeding commits. You good with this? [y/N] ")
+        i = input("\nAbout to submit the preceeding commits. You good with this? [y/N] ")
 
         if i != 'y':
             print("Cancelled...")
@@ -144,7 +144,7 @@ def main():
                 print("Already at top of HEAD")
                 pass
 
-            # Apply labels needed for a merge
+            # Apply labels needed for the submit
             j = {}
             j['labels'] = {}
             try:
@@ -157,17 +157,18 @@ def main():
                 sys.exit(1)
             response = requests.post(url + c + "/revisions/current/review", auth=auth, json=j)
             if response.status_code != 200:
-                print("Failed to +2 change " + c + " with error " + str(
+                print("Failed to apply labels to change " + c + " with error " + str(
                     response.status_code) + ": " + response.text.rstrip())
                 sys.exit(0)
 
-            # SHIPIT!!!
+            # Submit it
             response = requests.post(url + c + "/revisions/current/submit", auth=auth)
             if response.status_code != 200:
                 print(
-                    "Failed to ship " + c + " with error " + str(response.status_code) + ": " + response.text.rstrip())
+                    "Failed to submit " + c + " with error " + str(
+                        response.status_code) + ": " + response.text.rstrip())
             else:
-                print("Shipped: " + c + "!")
+                print("Submitted: " + c + "!")
 
 
 if __name__ == "__main__":
