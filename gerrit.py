@@ -122,7 +122,7 @@ def main():
                 sys.exit("Could not fetch commit information")
             else:
                 j = json.loads(response.text[5:])
-                messages.append("[%s] %s" % (j['status'], j['subject']))
+                messages.append("[%s] [%s] %s" % (j['status'], j['_number'], j['subject']))
         except:
             sys.exit()
 
