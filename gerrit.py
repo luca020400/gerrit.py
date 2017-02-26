@@ -80,7 +80,7 @@ def main():
     auth = HTTPDigestAuth(username=username, password=password)
 
     changes = []
-    url = "https://" + review_url + "/a/changes/"
+    url = review_url + "/a/changes/"
 
     if args:
         for i, param in enumerate(args):
