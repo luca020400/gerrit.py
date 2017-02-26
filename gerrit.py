@@ -133,7 +133,7 @@ def main():
         try:
             labels = config.get(review_url, "labels").split(',')
             labels_range = config.get(review_url, "labels_range").split(',')
-            for i in labels.size:
+            for i in range(0, len(labels)):
                 j['labels'][labels[i]] = '+' + labels_range[i]
         except:
             sys.exit('Failed to parse labels')
