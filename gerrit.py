@@ -186,10 +186,10 @@ def main():
                 if response.status_code == 200:
                     # Handle groups
                     if "Do you want to add them all as reviewers?" in response.text:
-                        k = {}
-                        k['input'] = reviewer
-                        k['confirmed'] = 'true'
-                        requests.post(url + c + "/reviewers", auth=auth, json=k)
+                        j = {}
+                        j['input'] = reviewer
+                        j['confirmed'] = 'true'
+                        requests.post(url + c + "/reviewers", auth=auth, json=j)
                     print('Succesfully added ' + reviewer + ' to ' + c)
                 else:
                     print("Failed to add reviewer " + reviewer + " to change " + c + " with error " + str(
