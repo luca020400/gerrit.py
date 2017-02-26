@@ -42,7 +42,7 @@ def main():
     group.add_option('-a', '--add-reviewers', dest='reviewers',
                      help='Add reviewers', metavar='REVIEWERS')
     group.add_option('-t', '--topic', dest='topic',
-                     help='Set topic or Merge by topic', metavar='TOPIC')
+                     help='Set topic or submit by topic', metavar='TOPIC')
 
     (options, args) = parser.parse_args()
 
@@ -131,6 +131,18 @@ def main():
             print("Cancelled...")
             sys.exit()
 
+        # Load labels needed for the submit
+        j = {}
+        j['labels'] = {}
+        try:
+            labels = config.get(review_url, "labels").split(',')
+            labels_range = config.get(review_url, "labels_range").split(',')
+            for i in labels.size:
+                j['labels'][labels[i]] = '+' + labels_range[i]
+        except:
+            print('Failed to parse labels')
+            sys.exit(1)
+
         for c in changes:
             try:
                 # Rebase it
@@ -144,17 +156,6 @@ def main():
                 print("Already at top of HEAD")
                 pass
 
-            # Apply labels needed for the submit
-            j = {}
-            j['labels'] = {}
-            try:
-                labels = config.get(review_url, "labels").split(',')
-                labels_range = config.get(review_url, "labels_range").split(',')
-                for i in labels.size:
-                    j['labels'][labels[i]] = '+' + labels_range[i]
-            except:
-                print('Failed to parse labels')
-                sys.exit(1)
             response = requests.post(url + c + "/revisions/current/review", auth=auth, json=j)
             if response.status_code != 200:
                 print("Failed to apply labels to change " + c + " with error " + str(
@@ -169,6 +170,30 @@ def main():
                         response.status_code) + ": " + response.text.rstrip())
             else:
                 print("Submitted: " + c + "!")
+    elif options.reviewers:
+        i = input("\nAbout to add reviewers to the preceeding commits. You good with this? [y/N] ")
+
+        if i != 'y':
+            print("Cancelled...")
+            sys.exit()
+
+        for c in changes:
+            reviewers = options.reviewers.split(',')
+            for reviewer in reviewers:
+                j = {}
+                j['reviewer'] = reviewer
+                response = requests.post(url + c + "/reviewers", auth=auth, json=j)
+                if response.status_code == 200:
+                    # Handle groups
+                    if "Do you want to add them all as reviewers?" in response.text:
+                        k = {}
+                        k['input'] = reviewer
+                        k['confirmed'] = 'true'
+                        requests.post(url + c + "/reviewers", auth=auth, json=k)
+                    print('Succesfully added ' + reviewer + ' to ' + c)
+                elif response.status_code != 200:
+                    print("Failed to add reviewer " + reviewer + " to change " + c + " with error " + str(
+                        response.status_code) + ": " + response.text.rstrip())
 
 
 if __name__ == "__main__":
