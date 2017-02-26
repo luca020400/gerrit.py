@@ -144,7 +144,7 @@ def main():
                 labels = config.get(review_url, "labels").split(',')
 
             if options.labels_ranges:
-                labels_ranges = options.labels_ranges
+                labels_ranges = options.labels_ranges.split(',')
             else:
                 labels_ranges = config.get(review_url, "labels_ranges").split(',')
 
