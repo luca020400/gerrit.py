@@ -183,7 +183,8 @@ def main():
                 else:
                     print("Failed to add reviewer " + reviewer + " to change " + c + " with error " + str(
                         response.status_code) + ": " + response.text.rstrip())
-
+    else:
+        sys.exit('Unsupported option')
 
 if __name__ == "__main__":
     main()
