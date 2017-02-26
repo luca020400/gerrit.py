@@ -191,7 +191,7 @@ def main():
                         k['confirmed'] = 'true'
                         requests.post(url + c + "/reviewers", auth=auth, json=k)
                     print('Succesfully added ' + reviewer + ' to ' + c)
-                elif response.status_code != 200:
+                else:
                     print("Failed to add reviewer " + reviewer + " to change " + c + " with error " + str(
                         response.status_code) + ": " + response.text.rstrip())
 
