@@ -159,23 +159,20 @@ def main():
                 response = requests.post(url + c + "/rebase", auth=auth)
                 if response.status_code != 200:
                     if response.status_code != 409 or "Change is already" not in response.text:
-                        sys.exit("Failed to rebase " + c + " with error " + str(
-                            response.status_code) + ": " + response.text.rstrip())
+                        sys.exit("Failed to rebase " + c + " with error: " + response.text.rstrip())
             except:
                 print("Already at top of HEAD")
                 pass
 
             response = requests.post(url + c + "/revisions/current/review", auth=auth, json=j)
             if response.status_code != 200:
-                sys.exit("Failed to apply labels to change " + c + " with error " + str(
-                    response.status_code) + ": " + response.text.rstrip())
+                sys.exit("Failed to apply labels to change " + c + " with error: " + response.text.rstrip())
 
             # Submit it
             response = requests.post(url + c + "/revisions/current/submit", auth=auth)
             if response.status_code != 200:
                 print(
-                    "Failed to submit " + c + " with error " + str(
-                        response.status_code) + ": " + response.text.rstrip())
+                    "Failed to submit " + c + " with error: " + response.text.rstrip())
             else:
                 print("Submitted: " + c + "!")
     elif options.reviewers:
@@ -196,8 +193,8 @@ def main():
                         requests.post(url + c + "/reviewers", auth=auth, json=j)
                     print('Succesfully added ' + reviewer + ' to ' + c)
                 else:
-                    print("Failed to add reviewer " + reviewer + " to change " + c + " with error " + str(
-                        response.status_code) + ": " + response.text.rstrip())
+                    print(
+                        "Failed to add reviewer " + reviewer + " to change " + c + " with error: " + response.text.rstrip())
     else:
         sys.exit('Unsupported option')
 
