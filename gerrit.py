@@ -44,6 +44,13 @@ def main():
     group.add_option('-t', '--topic', dest='topic',
                      help='Set topic or submit by topic', metavar='TOPIC')
 
+    # Labels
+    group = parser.add_option_group('Label options')
+    group.add_option('--labels', dest='labels',
+                     help='Specify the labels', metavar='LABEL,LABEL')
+    group.add_option('--labell-ranges', dest='labels_ranges',
+                     help='Specify the labels ranges', metavar='RANGE,RANGE')
+
     (options, args) = parser.parse_args()
 
     if not args and not options.topic:
@@ -131,10 +138,18 @@ def main():
         # Load labels needed for the submit
         j = {'labels': {}}
         try:
-            labels = config.get(review_url, "labels").split(',')
-            labels_range = config.get(review_url, "labels_range").split(',')
+            if options.labels:
+                labels = options.labels.split(',')
+            else:
+                labels = config.get(review_url, "labels").split(',')
+
+            if options.labels_ranges:
+                labels_ranges = options.labels_ranges
+            else:
+                labels_ranges = config.get(review_url, "labels_ranges").split(',')
+
             for i in range(0, len(labels)):
-                j['labels'][labels[i]] = '+' + labels_range[i]
+                j['labels'][labels[i]] = '+' + labels_ranges[i]
         except:
             sys.exit('Failed to parse labels')
 
@@ -146,7 +161,7 @@ def main():
                     if response.status_code != 409 or "Change is already" not in response.text:
                         sys.exit("Failed to rebase " + c + " with error " + str(
                             response.status_code) + ": " + response.text.rstrip())
-            except Exception:
+            except:
                 print("Already at top of HEAD")
                 pass
 
@@ -185,6 +200,7 @@ def main():
                         response.status_code) + ": " + response.text.rstrip())
     else:
         sys.exit('Unsupported option')
+
 
 if __name__ == "__main__":
     main()
