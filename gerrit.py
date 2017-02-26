@@ -117,7 +117,7 @@ def main():
                 sys.exit()
             else:
                 j = json.loads(response.text[5:])
-                messages.append("[" + j['status'] + "] " + j['subject'])
+                messages.append("[%s] %s" % (j['status'], j['subject']))
         except:
             sys.exit()
 
