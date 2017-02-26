@@ -46,7 +46,7 @@ def main():
 
     (options, args) = parser.parse_args()
 
-    if len(args) < 1 and not options.topic:
+    if not args and not options.topic:
         parser.error('You must specify either a range of commits or a topic')
         sys.exit()
 
@@ -82,6 +82,15 @@ def main():
     changes = []
     url = "https://" + review_url + "/a/changes/"
 
+    if args:
+        for i, param in enumerate(args):
+            if '-' in param:
+                templist = param.split('-')
+                for j in range(int(templist[0]), int(templist[1]) + 1):
+                    changes.append(str(j))
+            else:
+                changes.append(param)
+
     if options.topic:
         print('Fetching topic changes')
         response = requests.get(url + "?q=topic:" + options.topic, auth=auth)
@@ -91,15 +100,6 @@ def main():
             j = json.loads(response.text[5:])
             for k in j:
                 changes.append(str(k['_number']))
-
-    if args:
-        for i, param in enumerate(args):
-            if '-' in param:
-                templist = param.split('-')
-                for j in range(int(templist[0]), int(templist[1]) + 1):
-                    changes.append(str(j))
-            else:
-                changes.append(param)
 
     if len(changes) < 1:
         parser.error("You must specify either a range of commits or a topic")
