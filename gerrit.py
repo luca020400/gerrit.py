@@ -100,7 +100,7 @@ def main():
 
     if options.topic:
         print('Fetching topic changes')
-        response = requests.get(url + "?pp=0q&=topic:" + options.topic, auth=auth)
+        response = requests.get(url + "?q=topic:" + options.topic + "&pp=0", auth=auth)
         if response.status_code != 200:
             sys.exit("Could not fetch topic changes")
         else:
