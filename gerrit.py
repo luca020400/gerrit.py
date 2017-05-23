@@ -92,15 +92,18 @@ def main():
     if args:
         for i, param in enumerate(args):
             if '-' in param:
-                templist = param.split('-')
-                for j in range(int(templist[0]), int(templist[1]) + 1):
+                temp_list = param.split('-')
+                for j in range(int(temp_list[0]), int(temp_list[1]) + 1):
                     changes.append(str(j))
             else:
                 changes.append(param)
 
     if options.topic:
         print('Fetching topic changes')
-        response = requests.get(url + "?q=topic:" + options.topic + "&pp=0", auth=auth)
+        status = ""
+        if options.submit:
+            status = "+status:open"
+        response = requests.get(url + "?q=topic:" + options.topic + status + "&pp=0", auth=auth)
         if response.status_code != 200:
             sys.exit("Could not fetch topic changes")
         else:
@@ -130,7 +133,7 @@ def main():
         print(m)
 
     if options.submit:
-        i = input("\nAbout to submit the preceeding commits. You good with this? [y/N] ")
+        i = input("\nAbout to submit the proceeding commits. You good with this? [y/N] ")
 
         if i != 'y':
             sys.exit("Cancelled...")
@@ -171,12 +174,11 @@ def main():
             # Submit it
             response = requests.post(url + c + "/revisions/current/submit", auth=auth)
             if response.status_code != 200:
-                print(
-                    "Failed to submit " + c + " with error: " + response.text.rstrip())
+                print("Failed to submit " + c + " with error: " + response.text.rstrip())
             else:
                 print("Submitted: " + c + "!")
     elif options.reviewers:
-        i = input("\nAbout to add reviewers to the preceeding commits. You good with this? [y/N] ")
+        i = input("\nAbout to add reviewers to the proceeding commits. You good with this? [y/N] ")
 
         if i != 'y':
             sys.exit("Cancelled...")
@@ -191,10 +193,10 @@ def main():
                     if "Do you want to add them all as reviewers?" in response.text:
                         j = {'input': reviewer, 'confirmed': 'true'}
                         requests.post(url + c + "/reviewers", auth=auth, json=j)
-                    print('Succesfully added ' + reviewer + ' to ' + c)
+                    print('Successfully added ' + reviewer + ' to ' + c)
                 else:
-                    print(
-                        "Failed to add reviewer " + reviewer + " to change " + c + " with error: " + response.text.rstrip())
+                    print("Failed to add reviewer " + reviewer + " to change " + c +
+                          " with error: " + response.text.rstrip())
     else:
         sys.exit('Unsupported option')
 
