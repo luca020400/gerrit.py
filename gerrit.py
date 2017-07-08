@@ -15,7 +15,8 @@ CONFIG_FILENAME = os.getenv("HOME") + '/.gerrit.cfg'
 def main():
     config = configparser.ConfigParser()
     config.read(CONFIG_FILENAME)
-    parser = OptionParser(usage='%prog [options] changes', version="%prog " + version)
+    parser = OptionParser(
+        usage='%prog [options] changes', version="%prog " + version)
 
     # Logging
     group = parser.add_option_group('Logging options')
@@ -103,7 +104,8 @@ def main():
         status = ""
         if options.submit:
             status = "+status:open"
-        response = requests.get(url + "?q=topic:" + options.topic + status + "&pp=0", auth=auth)
+        response = requests.get(
+            url + "?q=topic:" + options.topic + status + "&pp=0", auth=auth)
         if response.status_code != 200:
             sys.exit("Could not fetch topic changes")
         else:
@@ -120,7 +122,7 @@ def main():
 
     for c in changes:
         try:
-            response = requests.get(url + c + "/detail/?pp=0", auth=auth)
+            response = requests.get(url + c + "?pp=0", auth=auth)
             if response.status_code != 200:
                 sys.exit("Could not fetch commit information")
             else:
@@ -133,7 +135,8 @@ def main():
         print(m)
 
     if options.submit:
-        i = input("\nAbout to submit the proceeding commits. You good with this? [y/N] ")
+        i = input(
+            "\nAbout to submit the proceeding commits. You good with this? [y/N] ")
 
         if i != 'y':
             sys.exit("Cancelled...")
@@ -149,10 +152,11 @@ def main():
             if options.labels_ranges:
                 labels_ranges = options.labels_ranges.split(',')
             else:
-                labels_ranges = config.get(review_url, "labels_ranges").split(',')
+                labels_ranges = config.get(
+                    review_url, "labels_ranges").split(',')
 
             for i in range(0, len(labels)):
-                j['labels'][labels[i]] = '+' + labels_ranges[i]
+                j['labels'][labels[i].strip()] = '+' + labels_ranges[i].strip()
         except:
             sys.exit('Failed to parse labels')
 
@@ -162,23 +166,29 @@ def main():
                 response = requests.post(url + c + "/rebase", auth=auth)
                 if response.status_code != 200:
                     if response.status_code != 409 or "Change is already" not in response.text:
-                        sys.exit("Failed to rebase " + c + " with error: " + response.text.rstrip())
+                        sys.exit("Failed to rebase " + c +
+                                 " with error: " + response.text.rstrip())
             except:
                 print("Already at top of HEAD")
                 pass
 
-            response = requests.post(url + c + "/revisions/current/review", auth=auth, json=j)
+            response = requests.post(
+                url + c + "/revisions/current/review", auth=auth, json=j)
             if response.status_code != 200:
-                sys.exit("Failed to apply labels to change " + c + " with error: " + response.text.rstrip())
+                sys.exit("Failed to apply labels to change " + c +
+                         " with error: " + response.text.rstrip())
 
             # Submit it
-            response = requests.post(url + c + "/revisions/current/submit", auth=auth)
+            response = requests.post(
+                url + c + "/revisions/current/submit", auth=auth)
             if response.status_code != 200:
-                print("Failed to submit " + c + " with error: " + response.text.rstrip())
+                print("Failed to submit " + c +
+                      " with error: " + response.text.rstrip())
             else:
                 print("Submitted: " + c + "!")
     elif options.reviewers:
-        i = input("\nAbout to add reviewers to the proceeding commits. You good with this? [y/N] ")
+        i = input(
+            "\nAbout to add reviewers to the proceeding commits. You good with this? [y/N] ")
 
         if i != 'y':
             sys.exit("Cancelled...")
@@ -186,13 +196,15 @@ def main():
         for c in changes:
             reviewers = options.reviewers.split(',')
             for reviewer in reviewers:
-                j = {'reviewer': reviewer}
-                response = requests.post(url + c + "/reviewers", auth=auth, json=j)
+                j = {'reviewer': reviewer.strip()}
+                response = requests.post(
+                    url + c + "/reviewers", auth=auth, json=j)
                 if response.status_code == 200:
                     # Handle groups
                     if "Do you want to add them all as reviewers?" in response.text:
                         j = {'input': reviewer, 'confirmed': 'true'}
-                        requests.post(url + c + "/reviewers", auth=auth, json=j)
+                        requests.post(url + c + "/reviewers",
+                                      auth=auth, json=j)
                     print('Successfully added ' + reviewer + ' to ' + c)
                 else:
                     print("Failed to add reviewer " + reviewer + " to change " + c +
