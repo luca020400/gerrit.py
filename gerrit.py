@@ -6,7 +6,7 @@ import requests
 import sys
 import configparser
 from optparse import OptionParser
-from requests.auth import HTTPDigestAuth
+from requests.auth import HTTPBasicAuth
 
 version = '0.1'
 CONFIG_FILENAME = os.getenv("HOME") + '/.gerrit.cfg'
@@ -85,7 +85,7 @@ def main():
             parser.error('Password must be set')
             sys.exit()
 
-    auth = HTTPDigestAuth(username=username, password=password)
+    auth = HTTPBasicAuth(username=username, password=password)
 
     changes = []
     url = review_url + "/a/changes/"
