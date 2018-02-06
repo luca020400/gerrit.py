@@ -1,11 +1,12 @@
 #!/usr/bin/env python
 
+import configparser
 import json
 import os
-import requests
 import sys
-import configparser
 from optparse import OptionParser
+
+import requests
 from requests.auth import HTTPBasicAuth
 
 version = '0.1'
@@ -127,7 +128,8 @@ def main():
                 sys.exit("Could not fetch commit information")
             else:
                 j = json.loads(response.text[5:])
-                messages.append("[%s] [%s] %s" % (j['status'], j['_number'], j['subject']))
+                messages.append("[%s] [%s] %s" %
+                                (j['status'], j['_number'], j['subject']))
         except:
             sys.exit()
 
