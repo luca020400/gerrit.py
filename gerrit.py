@@ -173,6 +173,7 @@ def main():
             response = requests.post(url + c + "/rebase", auth=auth, json=base)
             if response.status_code != 200:
                 if "change is merged" in response.text:
+                    print("Change " + c + " is already merged")
                     continue
                 if response.status_code != 409 or "Change is already" not in response.text:
                     sys.exit("Failed to rebase " + c +
