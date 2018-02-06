@@ -45,6 +45,8 @@ def main():
                      help='Add reviewers', metavar='REVIEWERS')
     group.add_option('-t', '--topic', dest='topic',
                      help='Set topic or submit by topic', metavar='TOPIC')
+    group.add_option('-e', '--exclude', dest='exclude',
+                     help='Exclude changes', metavar='EXCLUDE')
 
     # Labels
     group = parser.add_option_group('Label options')
@@ -113,6 +115,9 @@ def main():
             j = json.loads(response.text[5:])
             for k in j:
                 changes.append(str(k['_number']))
+
+    if options.exclude:
+        changes = list(set(changes) - set(options.exclude.split(',')))
 
     if len(changes) < 1:
         parser.error("You must specify either a range of commits or a topic")
