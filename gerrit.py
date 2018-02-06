@@ -95,7 +95,7 @@ def main():
 
     if args:
         for i, param in enumerate(args):
-            if '-' in param:
+            if '..' in param:
                 temp_list = param.split('..')
                 for j in range(int(temp_list[0]), int(temp_list[1]) + 1):
                     changes.append(str(j))
@@ -168,16 +168,13 @@ def main():
             sys.exit('Failed to parse labels')
 
         for c in changes:
-            try:
-                # Rebase it
-                response = requests.post(url + c + "/rebase", auth=auth)
-                if response.status_code != 200:
-                    if response.status_code != 409 or "Change is already" not in response.text:
-                        sys.exit("Failed to rebase " + c +
-                                 " with error: " + response.text.rstrip())
-            except:
-                print("Already at top of HEAD")
-                pass
+            # Rebase it
+            base = {'base': ''}
+            response = requests.post(url + c + "/rebase", auth=auth, json=base)
+            if response.status_code != 200:
+                if response.status_code != 409 or "Change is already" not in response.text:
+                    sys.exit("Failed to rebase " + c +
+                             " with error: " + response.text.rstrip())
 
             response = requests.post(
                 url + c + "/revisions/current/review", auth=auth, json=j)
