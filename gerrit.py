@@ -96,7 +96,7 @@ def main():
     if args:
         for i, param in enumerate(args):
             if '-' in param:
-                temp_list = param.split('-')
+                temp_list = param.split('..')
                 for j in range(int(temp_list[0]), int(temp_list[1]) + 1):
                     changes.append(str(j))
             else:
